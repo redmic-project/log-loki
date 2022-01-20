@@ -1,5 +1,12 @@
 version: '3.5'
 
+services:
+  loki:
+    deploy:
+      placement:
+        constraints:
+          - node.role == worker
+
 volumes:
   data-vol:
     name: ${DATA_VOL_NAME}
