@@ -17,6 +17,8 @@ services:
     configs:
       - source: config-file
         target: ${LOKI_CONFIG_FILE_PATH}
+      - source: rules-file
+        target: /loki/rules/rules.yaml
     logging:
       driver: local
     deploy:
@@ -49,3 +51,7 @@ configs:
   config-file:
     name: ${CONFIG_FILE_NAME:-loki-config-yaml}
     file: ./config/loki.yaml
+
+  rules-file:
+    name: ${RULES_FILE_NAME:-loki-rules-yaml}
+    file: ./rules/rules.yaml
