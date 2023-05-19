@@ -1,4 +1,4 @@
-version: '3.5'
+version: '3.9'
 
 services:
   loki:
@@ -12,5 +12,5 @@ volumes:
     name: ${DATA_VOL_NAME}
     driver: 'cloudstor:aws'
     driver_opts:
-      backing: ${VOL_BACKING:-shared}
-      perfmode: ${VOL_PERFMODE:-maxio}
+      backing: ${VOL_BACKING}
+      perfmode: ${VOL_PERFMODE}

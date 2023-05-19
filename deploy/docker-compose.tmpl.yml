@@ -1,15 +1,23 @@
-version: '3.5'
+version: '3.9'
 
 services:
   loki:
     image: ${IMAGE_NAME:-grafana/loki}:${IMAGE_TAG:-latest}
+    command: -config.file=${LOKI_CONFIG_FILE_PATH} -config.expand-env=true -target=all
+    environment:
+      LOKI_AUTH_ENABLED:
+      LOKI_REPORTING_ENABLED:
+      LOKI_SERVER_LOG_LEVEL:
     networks:
       log-net:
       metric-net:
     volumes:
       - data-vol:/loki
+    configs:
+      - source: config-file
+        target: ${LOKI_CONFIG_FILE_PATH}
     logging:
-      driver: json-file
+      driver: local
     deploy:
       mode: replicated
       replicas: ${REPLICAS:-1}
@@ -35,3 +43,8 @@ networks:
     name: ${METRIC_NET_NAME:-metric-net}
     driver: ${METRIC_NET_DRIVER:-overlay}
     external: true
+
+configs:
+  config-file:
+    name: ${CONFIG_FILE_NAME:-loki-config-yaml}
+    file: ./config/loki.yaml
