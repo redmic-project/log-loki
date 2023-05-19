@@ -1,5 +1,7 @@
 auth_enabled: ${LOKI_AUTH_ENABLED}
-reporting_enabled: ${LOKI_REPORTING_ENABLED}
+
+analytics:
+  reporting_enabled: ${LOKI_ANALYTICS_REPORTING_ENABLED}
 
 server:
   http_listen_address: 0.0.0.0

@@ -6,7 +6,7 @@ services:
     command: -config.file=${LOKI_CONFIG_FILE_PATH} -config.expand-env=true -target=all
     environment:
       LOKI_AUTH_ENABLED:
-      LOKI_REPORTING_ENABLED:
+      LOKI_ANALYTICS_REPORTING_ENABLED:
       LOKI_SERVER_LOG_LEVEL:
     networks:
       log-net:
