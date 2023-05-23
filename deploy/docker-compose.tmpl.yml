@@ -8,7 +8,7 @@ services:
       LOKI_AUTH_ENABLED:
       LOKI_ANALYTICS_REPORTING_ENABLED:
       LOKI_SERVER_LOG_LEVEL:
-      LOKI_FRONTEND_MAX_OUTSTANDING_PER_TENANT:
+      LOKI_QUERY_SCHEDULER_MAX_OUTSTANDING_REQUESTS_PER_TENANT:
     networks:
       log-net:
       metric-net:
@@ -18,7 +18,7 @@ services:
       - source: config-file
         target: ${LOKI_CONFIG_FILE_PATH}
       - source: rules-file
-        target: /loki/rules/rules.yaml
+        target: /loki/rules/fake/rules.yaml
     logging:
       driver: local
     deploy:

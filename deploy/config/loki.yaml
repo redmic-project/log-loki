@@ -34,5 +34,5 @@ schema_config:
 ruler:
   alertmanager_url: http://alertmanager:9093
 
-frontend:
-  max_outstanding_per_tenant: ${LOKI_FRONTEND_MAX_OUTSTANDING_PER_TENANT}
+query_scheduler:
+  max_outstanding_requests_per_tenant: ${LOKI_QUERY_SCHEDULER_MAX_OUTSTANDING_REQUESTS_PER_TENANT}
