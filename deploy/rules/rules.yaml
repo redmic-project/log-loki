@@ -4,15 +4,16 @@ groups:
     rules:
       - alert: LogsHighErrorRateByService
         expr: |
-          sum(rate({container_id=~".+"} |~ `(?i)(alert)|(crit)|(critical)|(fatal)|(emerg)|(error)|(eror)|(err)` [5m])) by (service_name)
+          sum(rate({level=~"critical|error"} [5m])) by (service_name)
             /
           sum(rate({container_id=~".+"} [5m])) by (service_name)
             > 0.1
         for: 10m
         labels:
-          severity: warning
+          severity: error
         annotations:
           summary: High error logs rate at '{{$labels.service_name}}' service
+
       - alert: LogsTooManyEntriesByService
         expr: |
           sum(rate({container_id=~".+"} [1m])) by (service_name) > 1
