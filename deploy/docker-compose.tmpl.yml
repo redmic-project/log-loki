@@ -9,6 +9,7 @@ x-loki-common: &loki-common
     LOKI_QUERY_SCHEDULER_MAX_OUTSTANDING_REQUESTS_PER_TENANT:
     LOKI_RULER_EXTERNAL_URL:
     LOKI_LIMITS_CONFIG_RETENTION_PERIOD:
+    LOKI_MEMBERLIST_JOIN_MEMBERS:
   networks:
     log-net:
     metric-net:
@@ -35,6 +36,7 @@ services:
   loki-read:
     << : *loki-common
     command: -config.file=${LOKI_CONFIG_FILE_PATH} -config.expand-env=true -target=read
+    hostname: loki-read-{{.Task.Slot}}
     deploy:
       << : *loki-deploy
       replicas: ${LOKI_READ_REPLICAS:-2}
@@ -49,6 +51,7 @@ services:
   loki-write:
     << : *loki-common
     command: -config.file=${LOKI_CONFIG_FILE_PATH} -config.expand-env=true -target=write
+    hostname: loki-write-{{.Task.Slot}}
     deploy:
       << : *loki-deploy
       replicas: ${LOKI_WRITE_REPLICAS:-1}
