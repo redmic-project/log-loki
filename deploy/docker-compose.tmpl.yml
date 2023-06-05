@@ -10,7 +10,7 @@ services:
       LOKI_SERVER_LOG_LEVEL:
       LOKI_QUERY_SCHEDULER_MAX_OUTSTANDING_REQUESTS_PER_TENANT:
       LOKI_RULER_EXTERNAL_URL:
-      LOKI_COMPACTOR_RETENTION_DELETE_DELAY:
+      LOKI_LIMITS_CONFIG_RETENTION_PERIOD:
     networks:
       log-net:
       metric-net:
@@ -32,11 +32,11 @@ services:
         delay: ${UPDATE_DELAY:-1m}
       resources:
         limits:
-          cpus: '${RESOURCES_LIMITS_CPUS:-1}'
-          memory: ${RESOURCES_LIMITS_MEMORY:-256M}
+          cpus: '${RESOURCES_LIMITS_CPUS:-2}'
+          memory: ${RESOURCES_LIMITS_MEMORY:-512M}
         reservations:
           cpus: '${RESOURCES_RESERVATIONS_CPUS:-0.1}'
-          memory: ${RESOURCES_RESERVATIONS_MEMORY:-128M}
+          memory: ${RESOURCES_RESERVATIONS_MEMORY:-256M}
 
 networks:
   log-net:
