@@ -33,7 +33,7 @@ schema_config:
         period: 24h
 
 memberlist:
-  join_members: ${LOKI_MEMBERLIST_JOIN_MEMBERS}
+  join_members: ["loki-read", "loki-write"]
   dead_node_reclaim_time: 30s
   gossip_to_dead_nodes_time: 15s
   left_ingesters_timeout: 30s
