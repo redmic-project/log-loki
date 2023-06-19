@@ -1,18 +1,11 @@
 version: '3.9'
 
-x-loki-deploy-prod: &loki-deploy-prod
-  placement:
-    constraints:
-      - node.role == worker
-
 services:
-  loki-read:
+  loki:
     deploy:
-      << : *loki-deploy-prod
-
-  loki-write:
-    deploy:
-      << : *loki-deploy-prod
+      placement:
+        constraints:
+          - node.role == worker
 
 volumes:
   data-vol:

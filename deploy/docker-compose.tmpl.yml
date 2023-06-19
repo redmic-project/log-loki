@@ -1,88 +1,42 @@
 version: '3.9'
 
-x-loki-common: &loki-common
-  image: ${IMAGE_NAME:-grafana/loki}:${IMAGE_TAG:-latest}
-  environment:
-    LOKI_AUTH_ENABLED:
-    LOKI_ANALYTICS_REPORTING_ENABLED:
-    LOKI_SERVER_LOG_LEVEL:
-    LOKI_QUERY_SCHEDULER_MAX_OUTSTANDING_REQUESTS_PER_TENANT:
-    LOKI_RULER_EXTERNAL_URL:
-    LOKI_LIMITS_CONFIG_RETENTION_PERIOD:
-  networks:
-    log-net:
-    metric-net:
-  volumes:
-    - data-vol:/loki
-  configs:
-    - source: config-file
-      target: ${LOKI_CONFIG_FILE_PATH}
-    - source: rules-file
-      target: /loki/rules/fake/rules.yaml
-  logging:
-    driver: local
-
-x-loki-deploy: &loki-deploy
-  mode: replicated
-  placement:
-    max_replicas_per_node: 1
-  restart_policy:
-    delay: ${RESTART_DELAY:-5s}
-  update_config:
-    delay: ${UPDATE_DELAY:-1m}
-
 services:
-  loki-read:
-    << : *loki-common
-    command: -config.file=${LOKI_CONFIG_FILE_PATH} -config.expand-env=true -target=read
-    deploy:
-      << : *loki-deploy
-      replicas: ${LOKI_READ_REPLICAS:-2}
-      resources:
-        limits:
-          cpus: '${LOKI_READ_RESOURCES_LIMITS_CPUS:-2}'
-          memory: ${LOKI_READ_RESOURCES_LIMITS_MEMORY:-512M}
-        reservations:
-          cpus: '${LOKI_READ_RESOURCES_RESERVATIONS_CPUS:-0.1}'
-          memory: ${LOKI_READ_RESOURCES_RESERVATIONS_MEMORY:-256M}
-
-  loki-write:
-    << : *loki-common
-    command: -config.file=${LOKI_CONFIG_FILE_PATH} -config.expand-env=true -target=write
-    deploy:
-      << : *loki-deploy
-      replicas: ${LOKI_WRITE_REPLICAS:-1}
-      resources:
-        limits:
-          cpus: '${LOKI_WRITE_RESOURCES_LIMITS_CPUS:-1}'
-          memory: ${LOKI_WRITE_RESOURCES_LIMITS_MEMORY:-256M}
-        reservations:
-          cpus: '${LOKI_WRITE_RESOURCES_RESERVATIONS_CPUS:-0.1}'
-          memory: ${LOKI_WRITE_RESOURCES_RESERVATIONS_MEMORY:-128M}
-
-  loki-gateway:
-    image: nginx:${NGINX_IMAGE_TAG:-alpine}
+  loki:
+    image: ${IMAGE_NAME:-grafana/loki}:${IMAGE_TAG:-latest}
+    command: -config.file=${LOKI_CONFIG_FILE_PATH} -config.expand-env=true -target=all
+    environment:
+      LOKI_AUTH_ENABLED:
+      LOKI_ANALYTICS_REPORTING_ENABLED:
+      LOKI_SERVER_LOG_LEVEL:
+      LOKI_QUERY_SCHEDULER_MAX_OUTSTANDING_REQUESTS_PER_TENANT:
+      LOKI_RULER_EXTERNAL_URL:
+      LOKI_LIMITS_CONFIG_RETENTION_PERIOD:
     networks:
       log-net:
-        aliases:
-          - loki
       metric-net:
-        aliases:
-          - loki
+    volumes:
+      - data-vol:/loki
     configs:
-      - source: nginx-conf
-        target: /etc/nginx/nginx.conf
+      - source: config-file
+        target: ${LOKI_CONFIG_FILE_PATH}
+      - source: rules-file
+        target: /loki/rules/fake/rules.yaml
+    logging:
+      driver: local
     deploy:
-      << : *loki-deploy
-      replicas: ${LOKI_GATEWAY_REPLICAS:-1}
+      mode: replicated
+      replicas: ${REPLICAS:-1}
+      restart_policy:
+        delay: ${RESTART_DELAY:-5s}
+      update_config:
+        delay: ${UPDATE_DELAY:-1m}
       resources:
         limits:
-          cpus: '${LOKI_GATEWAY_RESOURCES_LIMITS_CPUS:-1}'
-          memory: ${LOKI_GATEWAY_RESOURCES_LIMITS_MEMORY:-128M}
+          cpus: '${RESOURCES_LIMITS_CPUS:-2}'
+          memory: ${RESOURCES_LIMITS_MEMORY:-512M}
         reservations:
-          cpus: '${LOKI_GATEWAY_RESOURCES_RESERVATIONS_CPUS:-0.1}'
-          memory: ${LOKI_GATEWAY_RESOURCES_RESERVATIONS_MEMORY:-64M}
-
+          cpus: '${RESOURCES_RESERVATIONS_CPUS:-0.1}'
+          memory: ${RESOURCES_RESERVATIONS_MEMORY:-256M}
 
 networks:
   log-net:
@@ -103,7 +57,3 @@ configs:
   rules-file:
     name: ${RULES_FILE_NAME:-loki-rules-yaml}
     file: ./rules/rules.yaml
-
-  nginx-conf:
-    name: ${NGINX_CONF_NAME:-loki-nginx-conf}
-    file: ./config/nginx.conf
