@@ -10,7 +10,6 @@ x-loki-common: &loki-common
     LOKI_RULER_EXTERNAL_URL:
     LOKI_LIMITS_CONFIG_RETENTION_PERIOD:
     LOKI_MEMBERLIST_JOIN_MEMBERS:
-    LOKI_COMMON_COMPACTOR_ADDRESS:
   networks:
     log-net:
     metric-net:
