@@ -1,15 +1,28 @@
-version: '3.5'
+version: '3.9'
 
 services:
   loki:
     image: ${IMAGE_NAME:-grafana/loki}:${IMAGE_TAG:-latest}
+    command: -config.file=${LOKI_CONFIG_FILE_PATH} -config.expand-env=true -target=all
+    environment:
+      LOKI_AUTH_ENABLED:
+      LOKI_ANALYTICS_REPORTING_ENABLED:
+      LOKI_SERVER_LOG_LEVEL:
+      LOKI_QUERY_SCHEDULER_MAX_OUTSTANDING_REQUESTS_PER_TENANT:
+      LOKI_RULER_EXTERNAL_URL:
+      LOKI_LIMITS_CONFIG_RETENTION_PERIOD:
     networks:
       log-net:
       metric-net:
     volumes:
       - data-vol:/loki
+    configs:
+      - source: config-file
+        target: ${LOKI_CONFIG_FILE_PATH}
+      - source: rules-file
+        target: /loki/rules/fake/rules.yaml
     logging:
-      driver: json-file
+      driver: local
     deploy:
       mode: replicated
       replicas: ${REPLICAS:-1}
@@ -19,11 +32,11 @@ services:
         delay: ${UPDATE_DELAY:-1m}
       resources:
         limits:
-          cpus: '${RESOURCES_LIMITS_CPUS:-1}'
-          memory: ${RESOURCES_LIMITS_MEMORY:-256M}
+          cpus: '${RESOURCES_LIMITS_CPUS:-2}'
+          memory: ${RESOURCES_LIMITS_MEMORY:-512M}
         reservations:
           cpus: '${RESOURCES_RESERVATIONS_CPUS:-0.1}'
-          memory: ${RESOURCES_RESERVATIONS_MEMORY:-128M}
+          memory: ${RESOURCES_RESERVATIONS_MEMORY:-256M}
 
 networks:
   log-net:
@@ -35,3 +48,12 @@ networks:
     name: ${METRIC_NET_NAME:-metric-net}
     driver: ${METRIC_NET_DRIVER:-overlay}
     external: true
+
+configs:
+  config-file:
+    name: ${CONFIG_FILE_NAME:-loki-config-yaml}
+    file: ./config/loki.yaml
+
+  rules-file:
+    name: ${RULES_FILE_NAME:-loki-rules-yaml}
+    file: ./rules/rules.yaml

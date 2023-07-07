@@ -1,0 +1,55 @@
+auth_enabled: ${LOKI_AUTH_ENABLED}
+
+analytics:
+  reporting_enabled: ${LOKI_ANALYTICS_REPORTING_ENABLED}
+
+server:
+  http_listen_address: 0.0.0.0
+  grpc_listen_address: 0.0.0.0
+  http_listen_port: 3100
+  grpc_listen_port: 9095
+  log_level: ${LOKI_SERVER_LOG_LEVEL}
+
+common:
+  path_prefix: /loki
+  storage:
+    filesystem:
+      chunks_directory: /loki/chunks
+      rules_directory: /loki/rules
+  replication_factor: 1
+  ring:
+    kvstore:
+      store: inmemory
+
+schema_config:
+  configs:
+    - from: 2020-10-24
+      store: boltdb-shipper
+      object_store: filesystem
+      schema: v11
+      index:
+        prefix: index_
+        period: 24h
+
+ruler:
+  alertmanager_url: http://alertmanager:9093
+  external_url: ${LOKI_RULER_EXTERNAL_URL}
+
+query_scheduler:
+  max_outstanding_requests_per_tenant: ${LOKI_QUERY_SCHEDULER_MAX_OUTSTANDING_REQUESTS_PER_TENANT}
+
+compactor:
+  working_directory: /loki/compactor
+  shared_store: filesystem
+  retention_enabled: true
+
+limits_config:
+  retention_period: ${LOKI_LIMITS_CONFIG_RETENTION_PERIOD}
+  query_timeout: 5m
+
+chunk_store_config:
+  chunk_cache_config:
+    embedded_cache:
+      enabled: true
+      max_size_mb: 50
+      ttl: 1h
